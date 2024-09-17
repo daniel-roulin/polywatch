@@ -1,12 +1,11 @@
 -- Schema of the data base
+-- Temporary file for the creation of scrape.ts and co.
 
-BEGIN;
-
-CREATE TABLE IF NOT EXISTS sections (
-    id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nom VARCHAR(255) NOT NULL,
-    code VARCHAR(255) NOT NULL
-);
+-- CREATE TABLE IF NOT EXISTS sections (
+--     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+--     nom VARCHAR(255) NOT NULL,
+--     code VARCHAR(255) NOT NULL
+-- );
 
 CREATE TABLE IF NOT EXISTS eleves (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -61,5 +60,3 @@ CREATE TABLE IF NOT EXISTS periodes_salles (
     salle_id INTEGER REFERENCES salles(id),
     CONSTRAINT periodes_salles_pk PRIMARY KEY (periode_id, salle_id)
 );
-
-COMMIT;
