@@ -1,19 +1,19 @@
 -- Schema of the data base
 -- Temporary file for the creation of scrape.ts and co.
 
--- CREATE TABLE IF NOT EXISTS sections (
---     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
---     nom VARCHAR(255) NOT NULL,
---     code VARCHAR(255) NOT NULL
--- );
+CREATE TABLE IF NOT EXISTS sections (
+    code VARCHAR(255) PRIMARY KEY NOT NULL
+    nom VARCHAR(255) NOT NULL,
+);  
 
 CREATE TABLE IF NOT EXISTS eleves (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     nom VARCHAR(255) NOT NULL,
     prenom VARCHAR(255) NOT NULL,
     annee VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     lien_people TEXT NOT NULL,
-    section_id INTEGER REFERENCES sections(id)
+    section VARCHAR(255) REFERENCES sections(id)
 );
 
 CREATE TABLE IF NOT EXISTS cours (

@@ -55,24 +55,22 @@ const sections = [
     },
 ];
 
-export async function seedSections() {
+export async function scrapeSections() {
+    await client.sql`BEGIN`;
     await client.sql`
         CREATE TABLE IF NOT EXISTS sections (
-            id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-            nom VARCHAR(255) NOT NULL,
-            code VARCHAR(255) NOT NULL
-    );
+            code VARCHAR(255) PRIMARY KEY NOT NULL,
+            nom VARCHAR(255) NOT NULL
+        );
   `;
-
-    const insertedSections = await Promise.all(
+    await Promise.all(
         sections.map(async (section) => {
             return client.sql`
-                INSERT INTO sections (nom, code)
-                VALUES (${section.nom}, ${section.code})
+                INSERT INTO sections (code, nom)
+                VALUES (${section.code}, ${section.nom})
                 ON CONFLICT (code) DO NOTHING;
             `;
         }),
     );
-
-    return insertedSections;
+    await client.sql`COMMIT`;
 }
