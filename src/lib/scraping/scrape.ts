@@ -1,6 +1,6 @@
 import { db } from '@vercel/postgres';
 import { scrapeSections } from './sections';
-import { scrapeEleves } from './eleves';
+import { scrapeEleves } from './students';
 
 export const client = await db.connect();
 

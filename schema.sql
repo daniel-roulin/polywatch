@@ -6,42 +6,41 @@ CREATE TABLE IF NOT EXISTS sections (
     nom VARCHAR(255) NOT NULL,
 );  
 
-CREATE TABLE IF NOT EXISTS eleves (
+CREATE TABLE IF NOT EXISTS students (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nom VARCHAR(255) NOT NULL,
-    prenom VARCHAR(255) NOT NULL,
-    annee VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    lien_people TEXT NOT NULL,
-    section VARCHAR(255) REFERENCES sections(id)
+    email_id VARCHAR(255) UNIQUE NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    year VARCHAR(255) NOT NULL,
+    section VARCHAR(255) REFERENCES sections(code)
 );
 
-CREATE TABLE IF NOT EXISTS cours (
+CREATE TABLE IF NOT EXISTS classes (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     nom VARCHAR(255) NOT NULL,
     code VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS options_cours (
+CREATE TABLE IF NOT EXISTS options_classes (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     nom VARCHAR(255) NOT NULL,
     code VARCHAR(255) NOT NULL,
-    principal BOOLEAN NOT NULL,
-    cours_id INTEGER REFERENCES cours(id)
+    main BOOLEAN NOT NULL,
+    classes_id INTEGER REFERENCES classes(id)
 );
 
-CREATE TYPE TYPE_PERIODE AS ENUM('cours', 'labo', 'tp', 'exercices', 'projet');
+CREATE TYPE TYPE_TIMESLOT AS ENUM('classes', 'lab', 'tp', 'exercices', 'projet');
 
-CREATE TABLE IF NOT EXISTS periodes (
+CREATE TABLE IF NOT EXISTS timeslots (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    type_periode TYPE_PERIODE NOT NULL,
+    type_timeslot TYPE_TIMESLOT NOT NULL,
     debut INTEGER NOT NULL,
     fin INTEGER NOT NULL,
     semestre INTEGER NOT NULL,
-    options_cours_id INTEGER REFERENCES options_cours(id)
+    options_classes_id INTEGER REFERENCES options_classes(id)
 );
 
-CREATE TABLE IF NOT EXISTS salles (
+CREATE TABLE IF NOT EXISTS rooms (
     id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     nom VARCHAR(255) NOT NULL,
     batiment VARCHAR(255) NOT NULL,
@@ -49,14 +48,14 @@ CREATE TABLE IF NOT EXISTS salles (
     lien_plan TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS cours_sections (
-    cours_id INTEGER REFERENCES cours(id),
+CREATE TABLE IF NOT EXISTS classes_sections (
+    classes_id INTEGER REFERENCES classes(id),
     section_id INTEGER REFERENCES sections(id),
-    CONSTRAINT cours_sections_pk PRIMARY KEY (cours_id, section_id)
+    CONSTRAINT classes_sections_pk PRIMARY KEY (classes_id, section_id)
 );
 
-CREATE TABLE IF NOT EXISTS periodes_salles (
-    periode_id INTEGER REFERENCES periodes(id),
-    salle_id INTEGER REFERENCES salles(id),
-    CONSTRAINT periodes_salles_pk PRIMARY KEY (periode_id, salle_id)
+CREATE TABLE IF NOT EXISTS timeslots_rooms (
+    timeslot_id INTEGER REFERENCES timeslots(id),
+    room_id INTEGER REFERENCES rooms(id),
+    CONSTRAINT timeslots_rooms_pk PRIMARY KEY (timeslot_id, room_id)
 );
