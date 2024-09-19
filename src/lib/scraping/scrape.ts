@@ -7,9 +7,10 @@ export const client = await db.connect();
 export async function scrape() {
     try {
         // await scrapeSections();
-        await scrapeEleves();
+        // await scrapeEleves();
 
-        // TODO: Other tables
+        // TODO: Other tables (like rooms)
+        // Do we find the rooms directly or infer them from the courses?
 
         console.log("Database seeded successfully");
     } catch (error) {
