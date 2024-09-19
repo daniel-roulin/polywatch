@@ -23,8 +23,6 @@ const OpenLayersMap = () => {
                 zoom: 2,
             }),
         });
-
-        return () => map.setTarget(undefined);
     }, []);
 
     return <div ref={mapDivRef} className='map' />;
