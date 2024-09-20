@@ -6,7 +6,7 @@ import { Map, View } from 'ol';
 import 'ol/ol.css';
 import TileLayer from 'ol/layer/Tile';
 import { ImageTile, OSM } from 'ol/source';
-import proj4 from 'proj4';
+// import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4.js';
 import { get as getProjection } from 'ol/proj.js';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities.js';
@@ -17,9 +17,9 @@ const OpenLayersMap = () => {
     const mapDivRef = useRef<HTMLDivElement>(null);
     // useEffect to runs only on the first render
     useEffect(() => {
-        proj4.defs("EPSG:2056", "+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs");
-        register(proj4);
-        const swissProjection = getProjection('EPSG:2056') ?? undefined;
+        // proj4.defs("EPSG:2056", "+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs +type=crs");
+        // register(proj4);
+        // const swissProjection = getProjection('EPSG:2056') ?? undefined;
 
         // This does not work: no tile are requested
         // let map;
@@ -65,24 +65,21 @@ const OpenLayersMap = () => {
         // This does not work, the tiles coordonates are too big
         // Now it works, but it's broken AF if you ask for swissProjection
         // Now it works even better but the coordinates are all over the place.... Time to sleep
-        const map = new Map({
-            target: mapDivRef.current as HTMLDivElement,
-            layers: [
-                new TileLayer({
-                    source: new ImageTile({
-                        url: "https://prod-plan-epfl-tiles0.epfl.ch/1.0.0/osm-wmts/default/20230811/2056/{z}/{x}/{y}.png",
-                    }),
-                }),
-            ],
-            view: new View({
-                center: [0, 0], // Center the map to an appropriate location
-                zoom: 0, // Adjust zoom level
-                // projection: swissProjection // Set to Swiss coordinate system
-            })
-        });
-
-
-        console.log("hi mum!");
+        // const map = new Map({
+        //     target: mapDivRef.current as HTMLDivElement,
+        //     layers: [
+        //         new TileLayer({
+        //             source: new ImageTile({
+        //                 url: "https://prod-plan-epfl-tiles0.epfl.ch/1.0.0/osm-wmts/default/20230811/2056/{z}/{x}/{y}.png",
+        //             }),
+        //         }),
+        //     ],
+        //     view: new View({
+        //         center: [0, 0], // Center the map to an appropriate location
+        //         zoom: 0, // Adjust zoom level
+        //         // projection: swissProjection // Set to Swiss coordinate system
+        //     })
+        // });
 
         // This works: 
         // ...but it is the default osm map example
@@ -100,8 +97,11 @@ const OpenLayersMap = () => {
         //   });
 
     }, []);
-
+    return <iframe src="https://plan.epfl.ch/iframe/?dim_floor=1&map_x=2533400&map_y=1152502&map_zoom=12" className="map"></iframe>;
     return <div ref={mapDivRef} className='map' />;
 };
 
 export default OpenLayersMap;
+
+// https://plan.epfl.ch/iframe/?dim_floor=1&map_x=2533400&map_y=1152502&map_zoom=13
+// https://plan.epfl.ch/iframe/?dim_floor=1&map_x=2533400&map_y=1152502&map_zoom=12
