@@ -1,19 +1,7 @@
 import puppeteer, { Page, TimeoutError } from 'puppeteer';
 import { client } from "./scrape";
-
-const years = [
-    // TODO: MAN + Masters of other sections
-    "BA1",
-    "BA2",
-    "BA3",
-    "BA4",
-    "BA5",
-    "BA6",
-    "MA1",
-    "MA2",
-    "MA3",
-    "MA4",
-];
+import { fetchSections, fetchSemestres } from '../data';
+import { Section, Semester } from '../definitions';
 
 export async function scrapeEleves() {
     await client.sql`
@@ -22,29 +10,29 @@ export async function scrapeEleves() {
             email_id VARCHAR(255) UNIQUE NOT NULL,
             first_name VARCHAR(255) NOT NULL,
             last_name VARCHAR(255) NOT NULL,
-            year VARCHAR(255) NOT NULL,
+            semester VARCHAR(255) NOT NULL REFERENCES semestres(code),
             section VARCHAR(255) REFERENCES sections(code)
         );
   `;
-    const data = await client.sql`SELECT * FROM sections`;
-    const sections = data.rows.map(section => section.code);
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex++) {
-        for (let yearIndex = 0; yearIndex < years.length; yearIndex++) {
-            const currentSection = sections[sectionIndex];
-            const currentYear = years[yearIndex];
-            await scrapeVole(page, currentSection, currentYear);
+
+    const [sections, semesters] = await Promise.all([fetchSections(), fetchSemestres()]);
+
+    for (const section of sections) {
+        for (const semestere of semesters) {
+            await scrapeVole(page, section, semestere);
         }
     }
+
     browser.close();
     console.log('Finished scraping all students!');
 }
 
-async function scrapeVole(page: Page, section: string, year: string) {
-    console.log(`Scraping ${section}-${year}...`);
+async function scrapeVole(page: Page, section: Section, semester: Semester) {
+    console.log(`Scraping ${section.code}-${semester.code}...`);
     await client.sql`BEGIN`;
-    await page.goto(`https://search.epfl.ch/?filter=unit&q=${section}-${year}`);
+    await page.goto(`https://search.epfl.ch/?filter=unit&q=${section.code}-${semester.code}`);
     try {
         await page.waitForSelector('.table.result__table', {timeout: 5000});
     } catch (error) {
@@ -74,12 +62,12 @@ async function scrapeVole(page: Page, section: string, year: string) {
     await Promise.all(
         students.map(async (student) => {
             return client.sql`
-                INSERT INTO students (email_id, first_name, last_name, year, section)
-                VALUES (${student.email_id}, ${student.first_name}, ${student.last_name}, ${year}, ${section})
+                INSERT INTO students (email_id, first_name, last_name, semester, section)
+                VALUES (${student.email_id}, ${student.first_name}, ${student.last_name}, ${semester.code}, ${section.code})
                 ON CONFLICT (email_id) DO NOTHING;
             `;
         }),
     );
     await client.sql`COMMIT`;
-    console.log(`Scraped ${section}-${year}.`);
+    console.log(`Scraped ${section}-${semester}.`);
 }

@@ -1,73 +1,75 @@
+import { Section } from "../definitions";
 import { client } from "./scrape";
 
-const sections = [
+// TODO: Masters sections
+const sections: Section[] = [
     {
-        nom: "Microtechnique",
+        name: "Microtechnique",
         code: "MT",
     },
     {
-        nom: "Architecture",
+        name: "Architecture",
         code: "AR",
     },
     {
-        nom: "Chimie et génie chimique",
+        name: "Chimie et génie chimique",
         code: "CGC",
     },
     {
-        nom: "Génie civil",
+        name: "Génie civil",
         code: "GC",
     },
     {
-        nom: "Génie mécanique",
+        name: "Génie mécanique",
         code: "GM",
     },
     {
-        nom: "Génie électrique et électronique",
+        name: "Génie électrique et électronique",
         code: "EL",
     },
     {
-        nom: "Informatique",
+        name: "Informatique",
         code: "IN",
     },
     {
-        nom: "Ingénierie des sciences du vivant",
+        name: "Ingénierie des sciences du vivant",
         code: "SV",
     },
     {
-        nom: "Mathématiques",
+        name: "Mathématiques",
         code: "MA",
     },
     {
-        nom: "Physique",
+        name: "Physique",
         code: "PH",
     },
     {
-        nom: "Science et génie des matériaux",
+        name: "Science et génie des matériaux",
         code: "MX",
     },
     {
-        nom: "Sciences et ingénierie de l'environnement",
+        name: "Sciences et ingénierie de l'environnement",
         code: "SIE",
     },
     {
-        nom: "Systèmes de communication",
+        name: "Systèmes de communication",
         code: "SC",
     },
 ];
 
-export async function scrapeSections() {
+export async function seedSections() {
     await client.sql`BEGIN`;
     await client.sql`
         CREATE TABLE IF NOT EXISTS sections (
             code VARCHAR(255) PRIMARY KEY NOT NULL,
-            nom VARCHAR(255) NOT NULL
+            name VARCHAR(255) NOT NULL
         );
   `;
     await Promise.all(
         sections.map(async (section) => {
             return client.sql`
-                INSERT INTO sections (code, nom)
-                VALUES (${section.code}, ${section.nom})
+                INSERT INTO sections (code, name)
+                VALUES (${section.code}, ${section.name})
                 ON CONFLICT (code) DO NOTHING;
             `;
         }),

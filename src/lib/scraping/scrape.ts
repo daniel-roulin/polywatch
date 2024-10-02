@@ -1,15 +1,22 @@
 import { db } from '@vercel/postgres';
-import { scrapeSections } from './sections';
+import { seedSections } from './sections';
 import { scrapeEleves } from './students';
+import { seedSemestres } from './semesters';
+import { scrapeCourses } from './courses';
+import { scrapeAllRooms } from './rooms';
 
+// TODO: Does having a client objet makes sense?
 export const client = await db.connect();
 
 export async function scrape() {
     try {
-        // await scrapeSections();
+        // await seedSections();
+        // await seedSemestres();
         // await scrapeEleves();
+        // await scrapeCourses();
+        // TODO: timeslots and rooms
+        await scrapeAllRooms();
 
-        // TODO: Other tables (like rooms)
         // Do we find the rooms directly or infer them from the courses?
 
         console.log("Database seeded successfully");
