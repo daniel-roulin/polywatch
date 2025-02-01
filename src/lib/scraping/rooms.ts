@@ -1,21 +1,21 @@
 import { client } from './scrape';
 import * as cheerio from 'cheerio';
 
-export async function scrapeAllRooms() {
+export async function scrapeRooms() {
     await client.sql`
         CREATE TABLE IF NOT EXISTS rooms (
             id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-            name VARCHAR(255) NOT NULL,
-            building VARCHAR(255) NOT NULL,
-            floor INTEGER, -- The floor if we can parse it
-            url TEXT NOT NULL
+            name VARCHAR(255) UNIQUE NOT NULL,
+            building VARCHAR(255),
+            floor INTEGER,
+            url TEXT
         );
     `;
 
     const buildings = await scrapeBuildings();
 
     for (const building of buildings) {
-        await scrapeRooms(building);
+        await scrapeRoomsFromBuilding(building);
     }
 
     // TODO: Scrape floor information from the room pages if they are null
@@ -36,7 +36,7 @@ async function scrapeBuildings() {
     return buildings;
 }
 
-async function scrapeRooms(building: string) {
+async function scrapeRoomsFromBuilding(building: string) {
     const response = await fetch(`https://plan.epfl.ch/buildings/${building}.html`);
     if (!response.ok) {
         throw new Error('Network response was not ok');

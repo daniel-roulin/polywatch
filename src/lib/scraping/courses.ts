@@ -18,11 +18,6 @@ export async function scrapeCourses() {
             language VARCHAR(255) NOT NULL,
             credits INTEGER
         );
-    `;
-
-    // This table links courses to the semesters they are given in and 
-    // the section they are given to.
-    await client.sql`
         CREATE TABLE IF NOT EXISTS courses_section_semestre (
             course_id INTEGER REFERENCES courses(id),
             section_code VARCHAR(255) REFERENCES sections(code),
@@ -83,6 +78,7 @@ async function scrapeCourse(section: Section, cycle: string) {
 
             // Prof(s)
             // IDEE: Ajouter une table prof à la db
+            // Currently broken
             const prof_element = $(line).find('.enseignement-name');
             const prof = prof_element.find('a').map((i, element) => ({
                 name: $(element).text(),
@@ -116,9 +112,7 @@ async function scrapeCourse(section: Section, cycle: string) {
             });
         }
     }
-
-    // console.log(courses);
-
+    
     await client.sql`BEGIN`;
     await Promise.all(
         courses.map(async (course) => {

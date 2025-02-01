@@ -26,9 +26,25 @@ export type Course = {
     language: string;
 };
 
+export type RetrievedCourse = Course & {
+    id: number;
+};
+
 export type Room = {
     name: string;
     building: string;
     floor: number | null;
     url: string;
 };
+
+export type RetrievedRoom = Course & {
+    id: number;
+};
+
+export type Period = {
+    day_of_week: number;
+    start_time: number;
+    end_time: number;
+    type: string | null;
+    room_names: string[];
+  }
