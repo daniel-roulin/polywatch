@@ -4,7 +4,6 @@ import IframeMap from "@/ui/plan/iframe_map";
 import LeafletMap from "@/ui/plan/leaflet_map";
 import WMTSMap from "@/ui/plan/OL_WMTS_map";
 import XYZMap from "@/ui/plan/OL_XYZ_map";
-import HelloWorld from "@/ui/component";
 import dynamic from "next/dynamic";
 
 import React from "react";
