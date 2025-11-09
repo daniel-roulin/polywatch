@@ -9,7 +9,7 @@ Three data source:
     Contains the building images in `batiments` and the base map. Can choose floor when adding layer.
 
 - https://plan.epfl.ch/mapserv_proxy?ogcserver=MapServer&SERVICE=WMS&REQUEST=GetCapabilities
-    Contains room names in `locaux_labels`
+    Contains room names in `locaux_labels` and a lot of other icons spread out over the map.
 
 - http://127.0.0.1:5500/batiments_routes_labels.xml
     Contain building names in `batiments_routes_labels`
