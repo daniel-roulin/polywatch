@@ -16,7 +16,3 @@ Three data source:
 
 - http://127.0.0.1:5500/locaux_labels.xml
     Contains room names in `locaux_labels` 
-
-TODO:
-- Figure out how to get the room names for different floors.
-- Figure out how to make a webmap with all of this.

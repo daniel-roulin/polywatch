@@ -45,12 +45,12 @@ CREATE TABLE
         PRIMARY KEY (course_id, section_code, semestre_code)
     );
 
-CREATE TYPE TYPE_PERIOD AS ENUM ('course', 'lab', 'tp', 'exercices', 'projet');
+CREATE TYPE TYPE_TIMESLOT AS ENUM ('course', 'lab', 'tp', 'exercices', 'projet');
 
 CREATE TABLE
-    IF NOT EXISTS periods (
+    IF NOT EXISTS timeslot (
         id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-        type TYPE_PERIOD,
+        type TYPE_TIMESLOT,
         day_of_week INTEGER NOT NULL,
         start_time INTEGER NOT NULL,
         end_time INTEGER NOT NULL,
@@ -67,8 +67,8 @@ CREATE TABLE
     );
 
 CREATE TABLE
-    IF NOT EXISTS periods_rooms (
-        period_id INTEGER REFERENCES periods (id),
+    IF NOT EXISTS timeslot_rooms (
+        timeslot_id INTEGER REFERENCES timeslot (id),
         room_id INTEGER REFERENCES rooms (id),
-        PRIMARY KEY (period_id, room_id)
+        PRIMARY KEY (timeslot_id, room_id)
     );
