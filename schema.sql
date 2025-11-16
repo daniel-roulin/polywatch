@@ -48,7 +48,7 @@ CREATE TABLE
 CREATE TYPE TYPE_TIMESLOT AS ENUM ('course', 'lab', 'tp', 'exercices', 'projet');
 
 CREATE TABLE
-    IF NOT EXISTS timeslot (
+    IF NOT EXISTS timeslots (
         id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
         type TYPE_TIMESLOT,
         day_of_week INTEGER NOT NULL,
@@ -67,8 +67,8 @@ CREATE TABLE
     );
 
 CREATE TABLE
-    IF NOT EXISTS timeslot_rooms (
-        timeslot_id INTEGER REFERENCES timeslot (id),
+    IF NOT EXISTS timeslots_rooms (
+        timeslot_id INTEGER REFERENCES timeslots (id),
         room_id INTEGER REFERENCES rooms (id),
         PRIMARY KEY (timeslot_id, room_id)
     );

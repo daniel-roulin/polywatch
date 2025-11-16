@@ -4,7 +4,7 @@ import { scrapeEleves } from './students';
 import { seedSemestres } from './semesters';
 import { scrapeCourses } from './courses';
 import { scrapeRooms } from './rooms';
-import { scrapePeriods } from './period';
+import { scrapeTimeslots } from './timeslots';
 
 // TODO: Does having a client objet makes sense?
 export const client = await db.connect();
@@ -22,7 +22,7 @@ export async function scrape() {
 
         // await scrapeEleves();
         // await scrapeCourses();
-        await scrapePeriods();
+        await scrapeTimeslots();
 
         // The Moodle links all have the same structure: https://go.epfl.ch/MICRO-313
 

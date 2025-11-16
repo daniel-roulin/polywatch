@@ -1,19 +1,19 @@
 import { fetchCourseByCode, fetchCourses, fetchRoomByName } from "../data";
-import { Period, RetrievedCourse, RetrievedRoom } from "../definitions";
+import { Timeslot, RetrievedCourse, RetrievedRoom } from "../definitions";
 import { client } from "./scrape";
 import * as cheerio from 'cheerio';
 // import cli_progress from 'cli-progress';
 import prompt_sync from 'prompt-sync';
 
-export async function scrapePeriods() {
+export async function scrapeTimeslots() {
     await client.sql`
-        DROP TABlE IF EXISTS periods_rooms;
-        DROP TABlE IF EXISTS periods;
+        DROP TABlE IF EXISTS timeslots_rooms;
+        DROP TABlE IF EXISTS timeslots;
         DROP TYPE IF EXISTS TYPE_PERIOD;
 
         CREATE TYPE TYPE_PERIOD AS ENUM ('course', 'lab', 'tp', 'exercices', 'projet');
         CREATE TABLE
-            IF NOT EXISTS periods (
+            IF NOT EXISTS timeslots (
                 id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                 type TYPE_PERIOD,
                 day_of_week INTEGER NOT NULL,
@@ -22,16 +22,16 @@ export async function scrapePeriods() {
                 course_id INTEGER REFERENCES courses (id)
         );
         CREATE TABLE
-            IF NOT EXISTS periods_rooms (
-                period_id INTEGER REFERENCES periods (id),
+            IF NOT EXISTS timeslots_rooms (
+                timeslot_id INTEGER REFERENCES timeslot (id),
                 room_id INTEGER REFERENCES rooms (id),
-                PRIMARY KEY (period_id, room_id)
+                PRIMARY KEY (timeslot_id, room_id)
         );
     `;
 
     // TODO: Move all question at the beginning of the script in scrape.ts and handle progress bars there?
     // const container = new cli_progress.MultiBar({
-    //     format: "Scraping periods... [{bar}] {percentage}% | {value}/{total} | {eta_formatted} remaining"
+    //     format: "Scraping timeslots... [{bar}] {percentage}% | {value}/{total} | {eta_formatted} remaining"
     // });
     // const progress_bar = container.create(courses.length, 0);
 
@@ -54,15 +54,15 @@ export async function scrapePeriods() {
         const courses = await fetchCourses(semestre);
         for (const course of courses) {
             console.log("Scraping " + course.name);
-            await scrapePeriodsFromCourse(course);
+            await scrapeTimeslotsOfCourse(course);
         }
     }
 
     // const course = await fetchCourseByCode("CS-107");
-    // await scrapePeriodsFromCourse(course);
+    // await scrapeTimeslotsOfCourse(course);
 }
 
-async function scrapePeriodsFromCourse(course: RetrievedCourse) {
+async function scrapeTimeslotsOfCourse(course: RetrievedCourse) {
     const day_map: { [key: string]: number } = {
         'Lundi': 1,
         'Mardi': 2,
@@ -83,7 +83,7 @@ async function scrapePeriodsFromCourse(course: RetrievedCourse) {
     }
     const html = await response.text();
     const $ = cheerio.load(html);
-    const periods: Period[] = [];
+    const timeslots: Timeslot[] = [];
     $('.coursebook-week-caption.sr-only p').each((_, element) => {
         const text = $(element).text().trim();
         const day_match = text.match(/(Lundi|Mardi|Mercredi|Jeudi|Vendredi|Samedi|Dimanche)/);
@@ -99,7 +99,7 @@ async function scrapePeriodsFromCourse(course: RetrievedCourse) {
             if (type_match) {
                 type = type_map[type_match[1]];
             } else {
-                console.warn(`Did not find type of period ${text} in course ${course.code}: ${course.name}`);
+                console.warn(`Did not find type of ${text} in course ${course.code}: ${course.name}`);
             }
 
             const room_names: string[] = [];
@@ -111,7 +111,7 @@ async function scrapePeriodsFromCourse(course: RetrievedCourse) {
                 }
             });
 
-            periods.push({
+            timeslots.push({
                 type: type,
                 day_of_week: day_of_week,
                 start_time: start_time,
@@ -119,15 +119,15 @@ async function scrapePeriodsFromCourse(course: RetrievedCourse) {
                 room_names: room_names,
             });
         } else {
-            console.error(`Did not find time of period ${text} in course ${course.code}: ${course.name}`);
+            console.error(`Did not find time of ${text} in course ${course.code}: ${course.name}`);
             throw new Error('Invalid format');
         }
     });
 
     await Promise.all(
-        periods.map(async (period) => {
+        timeslots.map(async (timeslot) => {
             const result = await client.sql`
-                INSERT INTO periods (
+                INSERT INTO timeslots (
                     type,
                     day_of_week,
                     start_time,
@@ -135,19 +135,19 @@ async function scrapePeriodsFromCourse(course: RetrievedCourse) {
                     course_id
                 )
                 VALUES (
-                    ${period.type},
-                    ${period.day_of_week},
-                    ${period.start_time},
-                    ${period.end_time},
+                    ${timeslot.type},
+                    ${timeslot.day_of_week},
+                    ${timeslot.start_time},
+                    ${timeslot.end_time},
                     ${course.id}
                 )
                 RETURNING id;
             `;
 
-            // Insert the periods into the junction table
-            let period_id = result.rows[0]?.id;
+            // Insert the timeslots into the junction table
+            let timeslot_id = result.rows[0]?.id;
             await Promise.all(
-                period.room_names.map(async (room_name) => {
+                timeslot.room_names.map(async (room_name) => {
                     // Using INSERT ... ON CONFLICT to handle room creation atomically
                     const room = await client.sql`
                         INSERT INTO rooms (name)
@@ -159,12 +159,12 @@ async function scrapePeriodsFromCourse(course: RetrievedCourse) {
                     const room_id = room.rows[0].id;
 
                     await client.sql`
-                        INSERT INTO periods_rooms (
-                            period_id,
+                        INSERT INTO timeslots_rooms (
+                            timeslot_id,
                             room_id
                         )
                         VALUES (
-                            ${period_id},
+                            ${timeslot_id},
                             ${room_id}
                         )
                     `;

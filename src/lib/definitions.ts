@@ -41,7 +41,7 @@ export type RetrievedRoom = Course & {
     id: number;
 };
 
-export type Period = {
+export type Timeslot = {
     day_of_week: number;
     start_time: number;
     end_time: number;
